@@ -2169,6 +2169,51 @@ bool Image::initWithRawData(const unsigned char * data, ssize_t dataLen, int wid
     return ret;
 }
 
+bool Image::initWithFill(int width, int height, Color4F fillColour) {
+    size_t dataLen = width * height * 4;
+    unsigned char* tileData = new unsigned char[dataLen];
+
+    if (!initWithRawData(tileData, dataLen, width, height, 4, false)) {
+        return false;
+    }
+
+    fill(fillColour);
+
+    return true;
+}
+
+Color4F Image::getPixel(int x, int y) {
+    int idx = ((y * _width) + x) * getBitsPerPixel();
+    return (Color4F)Color4B(_data[idx], _data[idx + 1], _data[idx + 2], _data[idx + 3]);
+}
+
+void Image::setPixel(int x, int y, Color4F pixel) {
+    int idx = ((y * _width) + x) * getBitsPerPixel();
+    _data[idx] = pixel.r * 255;
+    _data[idx + 1] = pixel.g * 255;
+    _data[idx + 2] = pixel.b * 255;
+    _data[idx + 3] = pixel.a * 255;
+}
+
+void Image::fill(Color4F fillColour) {
+    int bits = getBitsPerPixel();
+
+    for (int n = 0; n < _dataLen; n += bits) {
+        _data[n] = fillColour.r * 255;
+        _data[n + 1] = fillColour.g * 255;
+        _data[n + 2] = fillColour.b * 255;
+        _data[n + 3] = fillColour.a * 255;
+    }
+}
+
+unsigned int Image::getBitsPerPixel()
+{
+    if (_renderFormat == Texture2D::PixelFormat::NONE || _renderFormat == Texture2D::PixelFormat::DEFAULT) {
+        return 0;
+    }
+
+    return Texture2D::getPixelFormatInfoMap().at(_renderFormat).bpp;
+}
 
 #if (CC_TARGET_PLATFORM != CC_PLATFORM_IOS)
 bool Image::saveToFile(const std::string& filename, bool isToRGB)

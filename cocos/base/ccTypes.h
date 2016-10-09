@@ -136,7 +136,7 @@ struct CC_DLL Color4F
     Color4F(float _r, float _g, float _b, float _a);
     explicit Color4F(const Color3B& color, float _a = 1.0f);
     explicit Color4F(const Color4B& color);
-
+    
     bool operator==(const Color4F& right) const;
     bool operator==(const Color3B& right) const;
     bool operator==(const Color4B& right) const;
@@ -148,6 +148,8 @@ struct CC_DLL Color4F
     {
         return (*this == other);
     }
+
+    unsigned int toInteger() const;
 
     GLfloat r;
     GLfloat g;

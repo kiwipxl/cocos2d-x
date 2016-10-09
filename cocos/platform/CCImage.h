@@ -135,7 +135,19 @@ public:
     // @warning kFmtRawData only support RGBA8888
     bool initWithRawData(const unsigned char * data, ssize_t dataLen, int width, int height, int bitsPerComponent, bool preMulti = false);
 
+    // only supports RGBA8888 right now
+    bool initWithFill(int width, int height, Color4F fillColour);
+
+    // only supports RGBA8888 right now
+    Color4F getPixel(int x, int y);
+    // only supports RGBA8888 right now
+    void setPixel(int x, int y, Color4F pixel);
+    
+    // only supports RGBA8888 right now
+    void fill(Color4F fillColour);
+
     // Getters
+    unsigned int getBitsPerPixel();
     unsigned char *   getData()               { return _data; }
     ssize_t           getDataLen()            { return _dataLen; }
     Format            getFileType()           { return _fileType; }

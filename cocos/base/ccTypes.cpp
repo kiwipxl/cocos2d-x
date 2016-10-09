@@ -214,6 +214,14 @@ bool Color4F::operator!=(const Color4B& right) const
     return !(*this == right);
 }
 
+unsigned int Color4F::toInteger() const {
+    unsigned char rb = r * 255;
+    unsigned char gb = g * 255;
+    unsigned char bb = b * 255;
+    unsigned char ab = a * 255;
+    return rb | (gb << 8) | (bb << 16) | (ab << 24);
+}
+
 /**
  * Color constants
  */
