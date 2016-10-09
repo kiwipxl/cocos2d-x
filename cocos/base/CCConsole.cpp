@@ -68,6 +68,7 @@
 #include "base/base64.h"
 #include "base/ccUtils.h"
 #include "base/allocator/CCAllocatorDiagnostics.h"
+#include "base/CCEventDispatcher.h"
 NS_CC_BEGIN
 
 extern const char* cocos2dVersion(void);
@@ -75,6 +76,8 @@ extern const char* cocos2dVersion(void);
 #define PROMPT  "> "
 
 static const size_t SEND_BUFSIZ = 512;
+
+EventDispatcher* logDispatcher = new EventDispatcher();
 
 /** private functions */
 namespace {
@@ -146,9 +149,12 @@ namespace {
                 break;
             
         } while (true);
-        
+
+        logDispatcher->setEnabled(true);
+        logDispatcher->dispatchCustomEvent("onLog", buf);
+
         strcat(buf, "\n");
-        
+
 #if CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID
         __android_log_print(ANDROID_LOG_DEBUG, "cocos2d-x debug info", "%s", buf);
         
