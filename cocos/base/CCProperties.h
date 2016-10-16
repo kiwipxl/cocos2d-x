@@ -37,7 +37,8 @@
 NS_CC_BEGIN
 
 class Properties;
-class Vec2;
+template <class T> class Vector2;
+typedef Vector2<float> Vec2;
 class Vec3;
 class Vec4;
 class Mat4;
