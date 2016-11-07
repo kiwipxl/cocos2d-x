@@ -167,7 +167,10 @@ public:
     * @param   data   User defined data, it is passed to func. 
     */
     void rayCast(PhysicsRayCastCallbackFunc func, const Vec2& start, const Vec2& end, void* data);
-    
+    void rayCast(PhysicsRayCastCallbackFunc func, const Vec2& start, const Vec2& end, void* data, unsigned int mask);
+    bool rayCastOnce(const Vec2& start, const Vec2& end, void* data, PhysicsRayCastInfo*& info);
+    bool rayCastOnce(const Vec2& start, const Vec2& end, void* data, PhysicsRayCastInfo*& info, unsigned int mask);
+
     /**
     * Searches for physics shapes that contains in the rect. 
     *

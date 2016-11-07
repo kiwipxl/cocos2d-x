@@ -105,7 +105,7 @@ public:
      * @param color The rectangle color.
      */
     void drawRect(const Vec2 &origin, const Vec2 &destination, const Color4F &color);
-    
+
     /** Draws a polygon given a pointer to point coordinates and the number of vertices measured in points.
      * The polygon can be closed or open.
      *
@@ -115,6 +115,7 @@ public:
      * @param color The polygon color.
      */
     void drawPoly(const Vec2 *poli, unsigned int numberOfPoints, bool closePolygon, const Color4F &color);
+    void drawPoly(Vec2 p0, Vec2 p1, Vec2 p2, const Color4F &color);
     
     /** Draws a circle given the center, radius and number of segments.
      *

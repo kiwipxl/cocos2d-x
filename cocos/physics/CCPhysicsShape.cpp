@@ -965,6 +965,22 @@ void PhysicsShape::setGroup(int group)
     _group = group;
 }
 
+void PhysicsShape::setCategoryBitmask(int bitmask) {
+    _categoryBitmask = bitmask;
+    updateFilters();
+}
+
+void PhysicsShape::setCollisionBitmask(int bitmask) {
+    _collisionBitmask = bitmask;
+    updateFilters();
+}
+
+void PhysicsShape::updateFilters() {
+    for (auto shape : _cpShapes) {
+        cpShapeSetFilter(shape, cpShapeFilterNew(_group, _categoryBitmask, _collisionBitmask));
+    }
+}
+
 bool PhysicsShape::containsPoint(const Vec2& point) const
 {
     for (auto shape : _cpShapes)

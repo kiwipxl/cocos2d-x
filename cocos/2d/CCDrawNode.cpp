@@ -504,6 +504,13 @@ void DrawNode::drawRect(const Vec2 &origin, const Vec2 &destination, const Color
     drawLine(Vec2(origin.x, destination.y), Vec2(origin.x, origin.y), color);
 }
 
+void DrawNode::drawPoly(Vec2 p0, Vec2 p1, Vec2 p2, const Color4F &color)
+{
+    drawLine(p0, p1, color);
+    drawLine(p1, p2, color);
+    drawLine(p2, p0, color);
+}
+
 void DrawNode::drawPoly(const Vec2 *poli, unsigned int numberOfPoints, bool closePolygon, const Color4F &color)
 {
     unsigned int vertext_count;

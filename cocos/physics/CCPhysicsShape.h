@@ -283,8 +283,8 @@ public:
      * Every physics body in a scene can be assigned to up to 32 different categories, each corresponding to a bit in the bit mask. You define the mask values used in your game. In conjunction with the collisionBitMask and contactTestBitMask properties, you define which physics bodies interact with each other and when your game is notified of these interactions.
      * @param bitmask An integer number, the default value is 0xFFFFFFFF (all bits set).
      */
-    void setCategoryBitmask(int bitmask) { _categoryBitmask = bitmask; }
-    
+    void setCategoryBitmask(int bitmask);
+
     /**
      * Get a mask that defines which categories this physics body belongs to.
      *
@@ -314,8 +314,8 @@ public:
      * When two physics bodies contact each other, a collision may occur. This body's collision mask is compared to the other body's category mask by performing a logical AND operation. If the result is a non-zero value, then this body is affected by the collision. Each body independently chooses whether it wants to be affected by the other body. For example, you might use this to avoid collision calculations that would make negligible changes to a body's velocity.
      * @param bitmask An integer number, the default value is 0xFFFFFFFF (all bits set).
      */
-    void setCollisionBitmask(int bitmask) { _collisionBitmask = bitmask; }
-    
+    void setCollisionBitmask(int bitmask);
+
     /**
      * Get a mask that defines which categories of physics bodies can collide with this physics body.
      *
@@ -330,7 +330,9 @@ public:
      * @param group An integer number, it have high priority than bit masks.
      */
     void setGroup(int group);
-    
+
+    void updateFilters();
+
     /**
      * Get the group of body.
      *

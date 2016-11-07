@@ -393,7 +393,45 @@ void PhysicsWorld::collisionSeparateCallback(PhysicsContact& contact)
     _eventDispatcher->dispatchEvent(&contact);
 }
 
-void PhysicsWorld::rayCast(PhysicsRayCastCallbackFunc func, const Vec2& point1, const Vec2& point2, void* data)
+bool PhysicsWorld::rayCastOnce(const Vec2& start, const Vec2& end, void* data, PhysicsRayCastInfo*& info, unsigned int mask)
+{
+    if (!_delayAddBodies.empty() || !_delayRemoveBodies.empty())
+    {
+        updateBodies();
+    }
+
+    cpSegmentQueryInfo cpInfo;
+
+    cpShape* shape = cpSpaceSegmentQueryFirst(_cpSpace,
+                    PhysicsHelper::point2cpv(start),
+                    PhysicsHelper::point2cpv(end),
+                    0.0f,
+                    { CP_NO_GROUP, (cpBitmask)mask, (cpBitmask)mask },
+                    &cpInfo);
+
+    if (shape == nullptr) {
+        return false;
+    }
+
+    PhysicsShape *physicsShape = static_cast<PhysicsShape*>(cpShapeGetUserData(shape));
+    CC_ASSERT(physicsShape != nullptr);
+
+    if (info != nullptr) {
+        info->shape = physicsShape;
+        info->start = start;
+        info->end = end;
+        info->contact = PhysicsHelper::cpv2point(cpInfo.point);
+        info->normal = PhysicsHelper::cpv2point(cpInfo.normal);
+        info->fraction = static_cast<float>(cpInfo.alpha);
+    }
+
+    return true;
+}
+bool PhysicsWorld::rayCastOnce(const Vec2& start, const Vec2& end, void* data, PhysicsRayCastInfo*& info) {
+    return rayCastOnce(start, end, data, info, (unsigned int)CP_ALL_CATEGORIES);
+}
+
+void PhysicsWorld::rayCast(PhysicsRayCastCallbackFunc func, const Vec2& point1, const Vec2& point2, void* data, unsigned int mask)
 {
     CCASSERT(func != nullptr, "func shouldn't be nullptr");
     
@@ -404,16 +442,20 @@ void PhysicsWorld::rayCast(PhysicsRayCastCallbackFunc func, const Vec2& point1, 
             updateBodies();
         }
         RayCastCallbackInfo info = { this, func, point1, point2, data };
-        
+
         PhysicsWorldCallback::continues = true;
         cpSpaceSegmentQuery(_cpSpace,
                             PhysicsHelper::point2cpv(point1),
                             PhysicsHelper::point2cpv(point2),
                             0.0f,
-                            CP_SHAPE_FILTER_ALL,
+                            { CP_NO_GROUP, (cpBitmask)mask, (cpBitmask)mask },
                             (cpSpaceSegmentQueryFunc)PhysicsWorldCallback::rayCastCallbackFunc,
                             &info);
     }
+}
+void PhysicsWorld::rayCast(PhysicsRayCastCallbackFunc func, const Vec2& point1, const Vec2& point2, void* data)
+{
+    rayCast(func, point1, point2, data, (unsigned int)CP_ALL_CATEGORIES);
 }
 
 void PhysicsWorld::queryRect(PhysicsQueryRectCallbackFunc func, const Rect& rect, void* data)

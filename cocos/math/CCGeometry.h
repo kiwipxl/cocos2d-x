@@ -185,16 +185,16 @@ public:
     float getMaxY() const; /// return the topmost y-value of current rect
 
     Vec2 getTL() const {
-        return Vec2(getMinX(), getMinY());
-    }
-    Vec2 getTR() const {
-        return Vec2(getMaxX(), getMinY());
-    }
-    Vec2 getBL() const {
         return Vec2(getMinX(), getMaxY());
     }
-    Vec2 getBR() const {
+    Vec2 getTR() const {
         return Vec2(getMaxX(), getMaxY());
+    }
+    Vec2 getBL() const {
+        return Vec2(getMinX(), getMinY());
+    }
+    Vec2 getBR() const {
+        return Vec2(getMaxX(), getMinY());
     }
 
     /**
