@@ -180,7 +180,8 @@ public:
     * @param   data   User defined data, it is passed to func. 
     */
     void queryRect(PhysicsQueryRectCallbackFunc func, const Rect& rect, void* data);
-    
+    void queryRect(PhysicsQueryRectCallbackFunc func, const Rect& rect, void* data, unsigned int mask);
+
     /**
     * Searches for physics shapes that contains the point. 
     *
@@ -190,7 +191,8 @@ public:
     * @param   data   User defined data, it is passed to func. 
     */
     void queryPoint(PhysicsQueryPointCallbackFunc func, const Vec2& point, void* data);
-    
+    void queryPoint(PhysicsQueryPointCallbackFunc func, const Vec2& point, void* data, unsigned int mask);
+
     /**
     * Get physics shapes that contains the point. 
     * 

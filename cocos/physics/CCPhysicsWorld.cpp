@@ -460,6 +460,10 @@ void PhysicsWorld::rayCast(PhysicsRayCastCallbackFunc func, const Vec2& point1, 
 
 void PhysicsWorld::queryRect(PhysicsQueryRectCallbackFunc func, const Rect& rect, void* data)
 {
+    queryRect(func, rect, data, (unsigned int)CP_ALL_CATEGORIES);
+}
+void PhysicsWorld::queryRect(PhysicsQueryRectCallbackFunc func, const Rect& rect, void* data, unsigned int mask)
+{
     CCASSERT(func != nullptr, "func shouldn't be nullptr");
     
     if (func != nullptr)
@@ -473,13 +477,17 @@ void PhysicsWorld::queryRect(PhysicsQueryRectCallbackFunc func, const Rect& rect
         PhysicsWorldCallback::continues = true;
         cpSpaceBBQuery(_cpSpace,
                        PhysicsHelper::rect2cpbb(rect),
-                       CP_SHAPE_FILTER_ALL,
+                       { CP_NO_GROUP, (cpBitmask)mask, (cpBitmask)mask },
                        (cpSpaceBBQueryFunc)PhysicsWorldCallback::queryRectCallbackFunc,
                        &info);
     }
 }
 
 void PhysicsWorld::queryPoint(PhysicsQueryPointCallbackFunc func, const Vec2& point, void* data)
+{
+    queryPoint(func, point, data, (unsigned int)CP_ALL_CATEGORIES);
+}
+void PhysicsWorld::queryPoint(PhysicsQueryPointCallbackFunc func, const Vec2& point, void* data, unsigned int mask)
 {
     CCASSERT(func != nullptr, "func shouldn't be nullptr");
     
@@ -495,7 +503,7 @@ void PhysicsWorld::queryPoint(PhysicsQueryPointCallbackFunc func, const Vec2& po
         cpSpacePointQuery(_cpSpace,
                                  PhysicsHelper::point2cpv(point),
                                  0,
-                                 CP_SHAPE_FILTER_ALL,
+                                 { CP_NO_GROUP, (cpBitmask)mask, (cpBitmask)mask },
                                  (cpSpacePointQueryFunc)PhysicsWorldCallback::queryPointFunc,
                                  &info);
     }

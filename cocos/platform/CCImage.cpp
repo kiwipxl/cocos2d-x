@@ -2183,22 +2183,21 @@ bool Image::initWithFill(int width, int height, Color4F fillColour) {
 }
 
 Color4F Image::getPixel(int x, int y) {
-    int idx = ((y * _width) + x) * getBitsPerPixel();
+    int idx = ((y * _width) + x) * 4;
     return (Color4F)Color4B(_data[idx], _data[idx + 1], _data[idx + 2], _data[idx + 3]);
 }
 
 void Image::setPixel(int x, int y, Color4F pixel) {
-    int idx = ((y * _width) + x) * getBitsPerPixel();
+    int idx = ((y * _width) + x) * 4;
     _data[idx] = pixel.r * 255;
     _data[idx + 1] = pixel.g * 255;
     _data[idx + 2] = pixel.b * 255;
     _data[idx + 3] = pixel.a * 255;
 }
 
-void Image::fill(Color4F fillColour) {
-    int bits = getBitsPerPixel();
-
-    for (int n = 0; n < _dataLen; n += bits) {
+void Image::fill(Color4F fillColour)
+{
+    for (int n = 0; n < _dataLen; n += 4) {
         _data[n] = fillColour.r * 255;
         _data[n + 1] = fillColour.g * 255;
         _data[n + 2] = fillColour.b * 255;
