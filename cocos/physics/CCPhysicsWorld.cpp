@@ -112,7 +112,7 @@ public:
 
 bool PhysicsWorldCallback::continues = true;
 
-cpBool PhysicsWorldCallback::collisionBeginCallbackFunc(cpArbiter *arb, struct cpSpace *space, PhysicsWorld *world)
+cpBool PhysicsWorldCallback::collisionBeginCallbackFunc(cpArbiter *arb, struct cpSpace* /*space*/, PhysicsWorld *world)
 {
     CP_ARBITER_GET_SHAPES(arb, a, b);
     
@@ -127,17 +127,17 @@ cpBool PhysicsWorldCallback::collisionBeginCallbackFunc(cpArbiter *arb, struct c
     return world->collisionBeginCallback(*contact);
 }
 
-cpBool PhysicsWorldCallback::collisionPreSolveCallbackFunc(cpArbiter *arb, cpSpace *space, PhysicsWorld *world)
+cpBool PhysicsWorldCallback::collisionPreSolveCallbackFunc(cpArbiter *arb, cpSpace* /*space*/, PhysicsWorld *world)
 {
     return world->collisionPreSolveCallback(*static_cast<PhysicsContact*>(cpArbiterGetUserData(arb)));
 }
 
-void PhysicsWorldCallback::collisionPostSolveCallbackFunc(cpArbiter *arb, cpSpace *space, PhysicsWorld *world)
+void PhysicsWorldCallback::collisionPostSolveCallbackFunc(cpArbiter *arb, cpSpace* /*space*/, PhysicsWorld *world)
 {
     world->collisionPostSolveCallback(*static_cast<PhysicsContact*>(cpArbiterGetUserData(arb)));
 }
 
-void PhysicsWorldCallback::collisionSeparateCallbackFunc(cpArbiter *arb, cpSpace *space, PhysicsWorld *world)
+void PhysicsWorldCallback::collisionSeparateCallbackFunc(cpArbiter *arb, cpSpace* /*space*/, PhysicsWorld *world)
 {
     PhysicsContact* contact = static_cast<PhysicsContact*>(cpArbiterGetUserData(arb));
     
@@ -200,7 +200,7 @@ void PhysicsWorldCallback::queryRectCallbackFunc(cpShape *shape, cpVect point, c
     PhysicsWorldCallback::continues = info->func(*info->world, *physicsShape, vpos, info->data);
 }
 
-void PhysicsWorldCallback::queryPointCallbackFunc(cpShape *shape, cpVect point, cpFloat distance, cpVect gradient, PointQueryCallbackInfo *info)
+void PhysicsWorldCallback::queryPointCallbackFunc(cpShape *shape, cpVect /*point*/, cpFloat /*distance*/, cpVect /*gradient*/, PointQueryCallbackInfo *info)
 {
     if (!PhysicsWorldCallback::continues) return;
 
@@ -210,7 +210,7 @@ void PhysicsWorldCallback::queryPointCallbackFunc(cpShape *shape, cpVect point, 
     PhysicsWorldCallback::continues = info->func(*info->world, *physicsShape, info->data);
 }
 
-void PhysicsWorldCallback::getShapesAtPointFunc(cpShape *shape, cpVect point, cpFloat distance, cpVect gradient, Vector<PhysicsShape*>* arr)
+void PhysicsWorldCallback::getShapesAtPointFunc(cpShape *shape, cpVect /*point*/, cpFloat /*distance*/, cpVect /*gradient*/, Vector<PhysicsShape*>* arr)
 {
     PhysicsShape *physicsShape = static_cast<PhysicsShape*>(cpShapeGetUserData(shape));
     CC_ASSERT(physicsShape != nullptr);
@@ -227,7 +227,7 @@ static inline cpSpaceDebugColor LAColor(float l, float a){
     return color;
 }
 
-static void DrawCircle(cpVect p, cpFloat a, cpFloat r, cpSpaceDebugColor outline, cpSpaceDebugColor fill, cpDataPointer data)
+static void DrawCircle(cpVect p, cpFloat /*a*/, cpFloat r, cpSpaceDebugColor outline, cpSpaceDebugColor fill, cpDataPointer data)
 {
     const Color4F fillColor(fill.r, fill.g, fill.b, fill.a);
     const Color4F outlineColor(outline.r, outline.g, outline.b, outline.a);
@@ -247,7 +247,7 @@ static void DrawCircle(cpVect p, cpFloat a, cpFloat r, cpSpaceDebugColor outline
     drawNode->drawPolygon(seg, CIRCLE_SEG_NUM, fillColor, 1, outlineColor);
 }
 
-static void DrawFatSegment(cpVect a, cpVect b, cpFloat r, cpSpaceDebugColor outline, cpSpaceDebugColor fill, cpDataPointer data)
+static void DrawFatSegment(cpVect a, cpVect b, cpFloat r, cpSpaceDebugColor outline, cpSpaceDebugColor /*fill*/, cpDataPointer data)
 {
     const Color4F outlineColor(outline.r, outline.g, outline.b, outline.a);
     DrawNode* drawNode = static_cast<DrawNode*>(data);
@@ -261,7 +261,7 @@ static void DrawSegment(cpVect a, cpVect b, cpSpaceDebugColor color, cpDataPoint
     DrawFatSegment(a, b, 0.0, color, color, data);
 }
 
-static void DrawPolygon(int count, const cpVect *verts, cpFloat r, cpSpaceDebugColor outline, cpSpaceDebugColor fill, cpDataPointer data)
+static void DrawPolygon(int count, const cpVect *verts, cpFloat /*r*/, cpSpaceDebugColor outline, cpSpaceDebugColor fill, cpDataPointer data)
 {
     const Color4F fillColor(fill.r, fill.g, fill.b, fill.a);
     const Color4F outlineColor(outline.r, outline.g, outline.b, outline.a);
@@ -276,14 +276,14 @@ static void DrawPolygon(int count, const cpVect *verts, cpFloat r, cpSpaceDebugC
     delete[] seg;
 }
 
-static void DrawDot(cpFloat size, cpVect pos, cpSpaceDebugColor color, cpDataPointer data)
+static void DrawDot(cpFloat /*size*/, cpVect pos, cpSpaceDebugColor color, cpDataPointer data)
 {
     const Color4F dotColor(color.r, color.g, color.b, color.a);
     DrawNode* drawNode = static_cast<DrawNode*>(data);
     drawNode->drawDot(PhysicsHelper::cpv2point(pos), 2, dotColor);
 }
 
-static cpSpaceDebugColor ColorForShape(cpShape *shape, cpDataPointer data)
+static cpSpaceDebugColor ColorForShape(cpShape *shape, cpDataPointer /*data*/)
 {
     if(cpShapeGetSensor(shape)){
         return LAColor(1.0f, 0.3f);

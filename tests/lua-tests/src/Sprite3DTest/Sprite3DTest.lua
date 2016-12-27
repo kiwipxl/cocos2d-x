@@ -1179,7 +1179,6 @@ function Sprite3DCubeMapTest:addNewSpriteWithCoords(pos)
 
     self._skyBox:setTexture(self._textureCube)
     self:addChild(self._skyBox)
-    self._skyBox:setScale(700)
 
     self:addChild(camera)
     self:setCameraMask(2)
@@ -1370,6 +1369,7 @@ function Sprite3DTest()
         Sprite3DNormalMappingTest.create,
         Sprite3DMaterialTest.create,
     }
+    Helper.index = 1
 
     scene:addChild(Sprite3DBasicTest.create())
     scene:addChild(CreateBackMenuItem())

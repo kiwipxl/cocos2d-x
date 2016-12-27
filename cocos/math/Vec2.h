@@ -357,7 +357,7 @@ public:
      * @param v The vector to add.
      * @return The vector sum.
      */
-    inline const Vector2<T> operator+(const Vector2<T>& v) const;
+    inline Vector2<T> operator+(const Vector2<T>& v) const;
 
     /**
      * Adds the given vector to this vector.
@@ -375,7 +375,7 @@ public:
      * @param v The vector to add.
      * @return The vector sum.
      */
-    inline const Vector2<T> operator-(const Vector2<T>& v) const;
+    inline Vector2<T> operator-(const Vector2<T>& v) const;
 
     /**
      * Subtracts the given vector from this vector.
@@ -392,7 +392,7 @@ public:
      * 
      * @return The negation of this vector.
      */
-    inline const Vector2<T> operator-() const;
+    inline Vector2<T> operator-() const;
 
     /**
      * Calculates the scalar product of this vector with the given value.
@@ -402,7 +402,7 @@ public:
      * @param s The value to scale by.
      * @return The scaled vector.
      */
-    inline const Vector2<T> operator*(T s) const;
+    inline Vector2<T> operator*(T s) const;
 
     /**
      * Scales this vector by the given value.
@@ -420,7 +420,7 @@ public:
      * @param s the constant to divide this vector with
      * @return a smaller vector
      */
-    inline const Vector2<T> operator/(T s) const;
+    inline Vector2<T> operator/(T s) const;
 
     /**
      * Determines if this vector is less than the given vector.
@@ -762,7 +762,7 @@ public:
  * @param v The vector to scale.
  * @return The scaled vector.
  */
-template <class T> inline const Vector2<T> operator*(T x, const Vector2<T>& v);
+template <class T> inline Vector2<T> operator*(T x, const Vector2<T>& v);
 
 typedef Vector2<float> Vec2;
 typedef Vector2<float> Point;

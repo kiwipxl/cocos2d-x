@@ -110,7 +110,7 @@ template <class T> inline void Vector2<T>::smooth(const Vector2<T>& target, floa
     }
 }
 
-template <class T> inline const Vector2<T> Vector2<T>::operator+(const Vector2<T>& v) const
+template <class T> inline Vector2<T> Vector2<T>::operator+(const Vector2<T>& v) const
 {
     Vector2<T> result(*this);
     result.add(v);
@@ -123,7 +123,7 @@ template <class T> inline Vector2<T>& Vector2<T>::operator+=(const Vector2<T>& v
     return *this;
 }
 
-template <class T> inline const Vector2<T> Vector2<T>::operator-(const Vector2<T>& v) const
+template <class T> inline Vector2<T> Vector2<T>::operator-(const Vector2<T>& v) const
 {
     Vector2<T> result(*this);
     result.subtract(v);
@@ -136,14 +136,14 @@ template <class T> inline Vector2<T>& Vector2<T>::operator-=(const Vector2<T>& v
     return *this;
 }
 
-template <class T> inline const Vector2<T> Vector2<T>::operator-() const
+template <class T> inline Vector2<T> Vector2<T>::operator-() const
 {
     Vector2<T> result(*this);
     result.negate();
     return result;
 }
 
-template <class T> inline const Vector2<T> Vector2<T>::operator*(T s) const
+template <class T> inline Vector2<T> Vector2<T>::operator*(T s) const
 {
     Vector2<T> result(*this);
     result.scale(s);
@@ -156,7 +156,7 @@ template <class T> inline Vector2<T>& Vector2<T>::operator*=(T s)
     return *this;
 }
 
-template <class T> inline const Vector2<T> Vector2<T>::operator/(const T s) const
+template <class T> inline Vector2<T> Vector2<T>::operator/(const T s) const
 {
     return Vector2<T>(this->x / s, this->y / s);
 }
@@ -189,7 +189,7 @@ template <class T> inline bool Vector2<T>::operator!=(const Vector2<T>& v) const
     return x!=v.x || y!=v.y;
 }
 
-template <class T> inline const Vector2<T> operator*(T x, const Vector2<T>& v)
+template <class T> inline Vector2<T> operator*(T x, const Vector2<T>& v)
 {
     Vector2<T> result(v);
     result.scale(x);
