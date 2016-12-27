@@ -61,13 +61,29 @@ namespace
         void* data;
     }RayCastCallbackInfo;
     
+    typedef struct BBQueryCallbackInfo
+    {
+        PhysicsWorld* world;
+        PhysicsQueryBBCallbackFunc func;
+        void* data;
+    }BBQueryCallbackInfo;
+    
+    typedef struct ShapeQueryCallbackInfo
+    {
+        PhysicsWorld* world;
+        PhysicsQueryShapeCallbackFunc func;
+        cpContactPointSet* pointsSet;
+        void* data;
+    }ShapeQueryCallbackInfo;
+
     typedef struct RectQueryCallbackInfo
     {
         PhysicsWorld* world;
         PhysicsQueryRectCallbackFunc func;
+        Rect rect;
         void* data;
     }RectQueryCallbackInfo;
-    
+
     typedef struct PointQueryCallbackInfo
     {
         PhysicsWorld* world;
@@ -84,8 +100,10 @@ public:
     static void collisionPostSolveCallbackFunc(cpArbiter *arb, cpSpace *space, PhysicsWorld *world);
     static void collisionSeparateCallbackFunc(cpArbiter *arb, cpSpace *space, PhysicsWorld *world);
     static void rayCastCallbackFunc(cpShape *shape, cpVect point, cpVect normal, cpFloat alpha, RayCastCallbackInfo *info);
-    static void queryRectCallbackFunc(cpShape *shape, RectQueryCallbackInfo *info);
-    static void queryPointFunc(cpShape *shape, cpVect point, cpFloat distance, cpVect gradient, PointQueryCallbackInfo *info);
+    static void queryBBCallbackFunc(cpShape *shape, BBQueryCallbackInfo *info);
+    static void queryShapeCallbackFunc(cpShape *shape, cpContactPointSet* points, ShapeQueryCallbackInfo *info);
+    static void queryRectCallbackFunc(cpShape *shape, cpVect point, cpFloat distance, cpVect gradient, RectQueryCallbackInfo *info);
+    static void queryPointCallbackFunc(cpShape *shape, cpVect point, cpFloat distance, cpVect gradient, PointQueryCallbackInfo *info);
     static void getShapesAtPointFunc(cpShape *shape, cpVect point, cpFloat distance, cpVect gradient, Vector<PhysicsShape*>* arr);
     
 public:
@@ -130,11 +148,8 @@ void PhysicsWorldCallback::collisionSeparateCallbackFunc(cpArbiter *arb, cpSpace
 
 void PhysicsWorldCallback::rayCastCallbackFunc(cpShape *shape, cpVect point, cpVect normal, cpFloat alpha, RayCastCallbackInfo *info)
 {
-    if (!PhysicsWorldCallback::continues)
-    {
-        return;
-    }
-    
+    if (!PhysicsWorldCallback::continues) return;
+
     PhysicsShape *physicsShape = static_cast<PhysicsShape*>(cpShapeGetUserData(shape));
     CC_ASSERT(physicsShape != nullptr);
     
@@ -151,16 +166,47 @@ void PhysicsWorldCallback::rayCastCallbackFunc(cpShape *shape, cpVect point, cpV
     PhysicsWorldCallback::continues = info->func(*info->world, callbackInfo, info->data);
 }
 
-void PhysicsWorldCallback::queryRectCallbackFunc(cpShape *shape, RectQueryCallbackInfo *info)
+void PhysicsWorldCallback::queryBBCallbackFunc(cpShape *shape, BBQueryCallbackInfo *info)
+{
+    if (!PhysicsWorldCallback::continues) return;
+    
+    PhysicsShape *physicsShape = static_cast<PhysicsShape*>(cpShapeGetUserData(shape));
+    CC_ASSERT(physicsShape != nullptr);
+
+    PhysicsWorldCallback::continues = info->func(*info->world, *physicsShape, info->data);
+}
+
+void PhysicsWorldCallback::queryShapeCallbackFunc(cpShape *shape, cpContactPointSet* points, ShapeQueryCallbackInfo *info)
 {
     PhysicsShape *physicsShape = static_cast<PhysicsShape*>(cpShapeGetUserData(shape));
     CC_ASSERT(physicsShape != nullptr);
-    
-    if (!PhysicsWorldCallback::continues)
-    {
-        return;
-    }
-    
+
+    if (!PhysicsWorldCallback::continues) return;
+
+    PhysicsWorldCallback::continues = info->func(*info->world, *physicsShape, points, info->data);
+}
+
+void PhysicsWorldCallback::queryRectCallbackFunc(cpShape *shape, cpVect point, cpFloat distance, cpVect gradient, RectQueryCallbackInfo *info)
+{
+    if (!PhysicsWorldCallback::continues) return;
+
+    // since we're doing a rect query with a point query, filter out anything not in our rect
+    Vec2 vpos(point.x, point.y);
+    if (!info->rect.containsPoint(vpos)) return;
+
+    PhysicsShape *physicsShape = static_cast<PhysicsShape*>(cpShapeGetUserData(shape));
+    CC_ASSERT(physicsShape != nullptr);
+
+    PhysicsWorldCallback::continues = info->func(*info->world, *physicsShape, vpos, info->data);
+}
+
+void PhysicsWorldCallback::queryPointCallbackFunc(cpShape *shape, cpVect point, cpFloat distance, cpVect gradient, PointQueryCallbackInfo *info)
+{
+    if (!PhysicsWorldCallback::continues) return;
+
+    PhysicsShape *physicsShape = static_cast<PhysicsShape*>(cpShapeGetUserData(shape));
+    CC_ASSERT(physicsShape != nullptr);
+
     PhysicsWorldCallback::continues = info->func(*info->world, *physicsShape, info->data);
 }
 
@@ -169,13 +215,6 @@ void PhysicsWorldCallback::getShapesAtPointFunc(cpShape *shape, cpVect point, cp
     PhysicsShape *physicsShape = static_cast<PhysicsShape*>(cpShapeGetUserData(shape));
     CC_ASSERT(physicsShape != nullptr);
     arr->pushBack(physicsShape);
-}
-
-void PhysicsWorldCallback::queryPointFunc(cpShape *shape, cpVect point, cpFloat distance, cpVect gradient, PointQueryCallbackInfo *info)
-{
-    PhysicsShape *physicsShape = static_cast<PhysicsShape*>(cpShapeGetUserData(shape));
-    CC_ASSERT(physicsShape != nullptr);
-    PhysicsWorldCallback::continues = info->func(*info->world, *physicsShape, info->data);
 }
 
 static inline cpSpaceDebugColor RGBAColor(float r, float g, float b, float a){
@@ -458,11 +497,11 @@ void PhysicsWorld::rayCast(PhysicsRayCastCallbackFunc func, const Vec2& point1, 
     rayCast(func, point1, point2, data, (unsigned int)CP_ALL_CATEGORIES);
 }
 
-void PhysicsWorld::queryRect(PhysicsQueryRectCallbackFunc func, const Rect& rect, void* data)
+void PhysicsWorld::queryBB(PhysicsQueryBBCallbackFunc func, const Rect& rect, void* data)
 {
-    queryRect(func, rect, data, (unsigned int)CP_ALL_CATEGORIES);
+    queryBB(func, rect, data, (unsigned int)CP_ALL_CATEGORIES);
 }
-void PhysicsWorld::queryRect(PhysicsQueryRectCallbackFunc func, const Rect& rect, void* data, unsigned int mask)
+void PhysicsWorld::queryBB(PhysicsQueryBBCallbackFunc func, const Rect& rect, void* data, unsigned int mask)
 {
     CCASSERT(func != nullptr, "func shouldn't be nullptr");
     
@@ -472,14 +511,73 @@ void PhysicsWorld::queryRect(PhysicsQueryRectCallbackFunc func, const Rect& rect
         {
             updateBodies();
         }
-        RectQueryCallbackInfo info = {this, func, data};
+        BBQueryCallbackInfo info = {this, func, data};
         
         PhysicsWorldCallback::continues = true;
         cpSpaceBBQuery(_cpSpace,
-                       PhysicsHelper::rect2cpbb(rect),
+                       PhysicsHelper::rect2cpbb(rect), 
                        { CP_NO_GROUP, (cpBitmask)mask, (cpBitmask)mask },
-                       (cpSpaceBBQueryFunc)PhysicsWorldCallback::queryRectCallbackFunc,
+                       (cpSpaceBBQueryFunc)PhysicsWorldCallback::queryBBCallbackFunc,
                        &info);
+    }
+}
+
+void PhysicsWorld::queryShape(PhysicsQueryShapeCallbackFunc func, PhysicsShape& shape, void* data)
+{
+    queryShape(func, shape, data, (unsigned int)CP_ALL_CATEGORIES);
+}
+void PhysicsWorld::queryShape(PhysicsQueryShapeCallbackFunc func, PhysicsShape& shape, void* data, unsigned int mask)
+{
+    CCASSERT(func != nullptr, "func shouldn't be nullptr");
+
+    if (func != nullptr)
+    {
+        if (!_delayAddBodies.empty() || !_delayRemoveBodies.empty())
+        {
+            updateBodies();
+        }
+
+        for (cpShape* s : shape._cpShapes)
+        {
+            ShapeQueryCallbackInfo info = { this, func, nullptr, data };
+
+            PhysicsWorldCallback::continues = true;
+            cpSpaceShapeQuery(_cpSpace, s, 
+                (cpSpaceShapeQueryFunc)PhysicsWorldCallback::queryShapeCallbackFunc,
+                &info);
+        }
+    }
+}
+
+void PhysicsWorld::queryRect(PhysicsQueryRectCallbackFunc func, const Rect& rect, void* data)
+{
+    queryRect(func, rect, data, (unsigned int)CP_ALL_CATEGORIES);
+}
+void PhysicsWorld::queryRect(PhysicsQueryRectCallbackFunc func, const Rect& rect, void* data, unsigned int mask)
+{
+    CCASSERT(func != nullptr, "func shouldn't be nullptr");
+
+    if (func != nullptr)
+    {
+        if (!_delayAddBodies.empty() || !_delayRemoveBodies.empty())
+        {
+            updateBodies();
+        }
+        RectQueryCallbackInfo info = { this, func, rect, data };
+
+        // calculate the radius so it's just exactly overlapping the rectangle
+        float radius = std::max(rect.size.width, rect.size.height);
+        radius += (Vec2(rect.size.width, rect.size.height) * .5f).length();
+
+        // do a point query because chipmunk doesn't seem to support a rect query. we will filter out
+        // any collisions not in our rect
+        PhysicsWorldCallback::continues = true;
+        cpSpacePointQuery(_cpSpace,
+            PhysicsHelper::point2cpv(rect.origin + (rect.size * .5f)),
+            radius, 
+            { CP_NO_GROUP, (cpBitmask)mask, (cpBitmask)mask },
+            (cpSpacePointQueryFunc)PhysicsWorldCallback::queryRectCallbackFunc,
+            &info);
     }
 }
 
@@ -498,14 +596,14 @@ void PhysicsWorld::queryPoint(PhysicsQueryPointCallbackFunc func, const Vec2& po
             updateBodies();
         }
         PointQueryCallbackInfo info = {this, func, data};
-        
+
         PhysicsWorldCallback::continues = true;
         cpSpacePointQuery(_cpSpace,
-                                 PhysicsHelper::point2cpv(point),
-                                 0,
-                                 { CP_NO_GROUP, (cpBitmask)mask, (cpBitmask)mask },
-                                 (cpSpacePointQueryFunc)PhysicsWorldCallback::queryPointFunc,
-                                 &info);
+                            PhysicsHelper::point2cpv(point),
+                            0,
+                            { CP_NO_GROUP, (cpBitmask)mask, (cpBitmask)mask },
+                            (cpSpacePointQueryFunc)PhysicsWorldCallback::queryPointCallbackFunc,
+                            &info);
     }
 }
 

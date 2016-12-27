@@ -81,8 +81,10 @@ typedef struct PhysicsRayCastInfo
  * @return true to continue, false to terminate
  */
 typedef std::function<bool(PhysicsWorld& world, const PhysicsRayCastInfo& info, void* data)> PhysicsRayCastCallbackFunc;
-typedef std::function<bool(PhysicsWorld&, PhysicsShape&, void*)> PhysicsQueryRectCallbackFunc;
-typedef PhysicsQueryRectCallbackFunc PhysicsQueryPointCallbackFunc;
+typedef std::function<bool(PhysicsWorld&, PhysicsShape&, void*)> PhysicsQueryBBCallbackFunc;
+typedef PhysicsQueryBBCallbackFunc PhysicsQueryPointCallbackFunc;
+typedef std::function<bool(PhysicsWorld&, PhysicsShape&, Vec2, void*)> PhysicsQueryRectCallbackFunc;
+typedef std::function<bool(PhysicsWorld&, PhysicsShape&, void*, void*)> PhysicsQueryShapeCallbackFunc;
 
 /**
  * @addtogroup physics
@@ -172,12 +174,32 @@ public:
     bool rayCastOnce(const Vec2& start, const Vec2& end, void* data, PhysicsRayCastInfo*& info, unsigned int mask);
 
     /**
-    * Searches for physics shapes that contains in the rect. 
+    * Searches for physics shapes that have their bounding box overlappping the given rect.
+    * Very fast. If you do not want to test bounding boxes, then you may also use shapeQuery()
     *
-    * Query this physics world to find all shapes overlap rect.
     * @param   func   Func is called for each shape whose bounding box overlaps rect. 
     * @param   rect   A Rect object contains a rectangle's x, y, width and height.
     * @param   data   User defined data, it is passed to func. 
+    */
+    void queryBB(PhysicsQueryBBCallbackFunc func, const Rect& rect, void* data);
+    void queryBB(PhysicsQueryBBCallbackFunc func, const Rect& rect, void* data, unsigned int mask);
+
+    /**
+    * Searches for physics shapes that overlap with the given shape.
+    *
+    * @param   func   Func is called for each shape whose bounding box overlaps rect.
+    * @param   rect   A Rect object contains a rectangle's x, y, width and height.
+    * @param   data   User defined data, it is passed to func.
+    */
+    void queryShape(PhysicsQueryShapeCallbackFunc func, PhysicsShape& shape, void* data);
+    void queryShape(PhysicsQueryShapeCallbackFunc func, PhysicsShape& shape, void* data, unsigned int mask);
+
+    /**
+    * Searches for physics shapes that overlap with the given rect.
+    *
+    * @param   func   Func is called for each shape whose bounding box overlaps rect.
+    * @param   rect   A Rect object contains a rectangle's x, y, width and height.
+    * @param   data   User defined data, it is passed to func.
     */
     void queryRect(PhysicsQueryRectCallbackFunc func, const Rect& rect, void* data);
     void queryRect(PhysicsQueryRectCallbackFunc func, const Rect& rect, void* data, unsigned int mask);
